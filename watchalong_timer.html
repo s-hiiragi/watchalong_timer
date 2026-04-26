@@ -58,6 +58,13 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      transition: transform 0.05s ease, box-shadow 0.05s ease;
+      box-shadow: 0 4px 0 #222;
+    }
+    button:active,
+    button.pressed {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #222;
     }
     .start { background: #2ecc71; }
     .pause { background: #f1c40f; }
@@ -200,6 +207,7 @@
       if (timerId) {
         clearInterval(timerId);
         timerId = null;
+        pressButton("pauseBtn");
       } else {
         document.getElementById("startBtn").click();
       }
@@ -210,7 +218,17 @@
         helpOverlay.style.display === "none" ? "flex" : "none";
     }
 
-    document.getElementById("startBtn").onclick = () => {
+    function pressButton(id) {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+
+      btn.classList.add("pressed");
+      setTimeout(() => {
+        btn.classList.remove("pressed");
+      }, 100);
+    }
+
+    document.getElementById("startBtn").onclick = (event) => {
       if (timerId) return;
 
       if (totalSeconds === 0) {
@@ -228,27 +246,49 @@
           timerId = null;
         }
       }, 1000);
+      
+      pressButton(event.currentTarget.id);
     };
 
-    document.getElementById("pauseBtn").onclick = () => {
+    document.getElementById("pauseBtn").onclick = (event) => {
       clearInterval(timerId);
       timerId = null;
+      pressButton(event.currentTarget.id);
     };
 
-    document.getElementById("resetBtn").onclick = () => {
+    document.getElementById("resetBtn").onclick = (event) => {
       clearInterval(timerId);
       timerId = null;
       elapsedSeconds = 0;
       totalSeconds = 0;
       updateDisplay();
+      pressButton(event.currentTarget.id);
     };
 
-    document.getElementById("minus10s").onclick = () => jump(-10);
-    document.getElementById("plus10s").onclick  = () => jump(10);
-    document.getElementById("minus1s").onclick = () => jump(-1);
-    document.getElementById("plus1s").onclick  = () => jump(1);
-    document.getElementById("minus1m").onclick  = () => jump(-60);
-    document.getElementById("plus1m").onclick   = () => jump(60);
+    document.getElementById("minus10s").onclick = (event) => {
+      jump(-10);
+      pressButton(event.currentTarget.id);
+    }
+    document.getElementById("plus10s").onclick  = (event) => {
+      jump(10);
+      pressButton(event.currentTarget.id);
+    }
+    document.getElementById("minus1s").onclick = (event) => {
+      jump(-1);
+      pressButton(event.currentTarget.id);
+    }
+    document.getElementById("plus1s").onclick  = (event) => {
+      jump(1);
+      pressButton(event.currentTarget.id);
+    }
+    document.getElementById("minus1m").onclick  = (event) => {
+      jump(-60);
+      pressButton(event.currentTarget.id);
+    }
+    document.getElementById("plus1m").onclick   = (event) => {
+      jump(60);
+      pressButton(event.currentTarget.id);
+    }
 
     document.addEventListener("keydown", (e) => {
       // 入力中は無効化
@@ -293,7 +333,11 @@
 
         case "Escape":
           e.preventDefault();
-          helpOverlay.style.display = "none";
+          if (helpOverlay.style.display === "none") {
+            // do nothing
+          } else {
+            helpOverlay.style.display = "none";
+          }
           break;
       }
     });
