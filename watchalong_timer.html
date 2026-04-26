@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>同時視聴タイマー</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .app {
+      background: #1c1c1c;
+      padding: 24px 32px;
+      border-radius: 12px;
+      width: 320px;
+    }
+    h1 {
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    label {
+      font-size: 14px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: none;
+    }
+    .time {
+      display: flex;
+      justify-content: space-between;
+      margin: 12px 0;
+      font-size: 16px;
+    }
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    button {
+      flex: 1;
+      padding: 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .start { background: #2ecc71; }
+    .pause { background: #f1c40f; }
+    .reset { background: #e74c3c; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>🎬 同時視聴タイマー</h1>
+
+    <label>映画の長さ（分:秒）</label>
+    <input type="text" id="durationInput" placeholder="例：120:00">
+
+    <div class="time">
+      <div>経過時間<br><strong id="elapsed">00:00:00</strong></div>
+      <div>残り時間<br><strong id="remaining">00:00:00</strong></div>
+    </div>
+
+    <div class="controls">
+      <button class="start" id="startBtn">開始</button>
+      <button class="pause" id="pauseBtn">一時停止</button>
+      <button class="reset" id="resetBtn">リセット</button>
+    </div>
+  </div>
+
+  <script>
+    let totalSeconds = 0;
+    let elapsedSeconds = 0;
+    let timerId = null;
+
+    const elapsedEl = document.getElementById("elapsed");
+    const remainingEl = document.getElementById("remaining");
+
+    function parseDuration(value) {
+      const parts = value.split(":").map(Number);
+      if (parts.length === 2) {
+        return parts[0] * 60 + parts[1];
+      }
+      return 0;
+    }
+
+    function formatTime(sec) {
+      const h = String(Math.floor(sec / 3600)).padStart(2, "0");
+      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+      const s = String(sec % 60).padStart(2, "0");
+      return `${h}:${m}:${s}`;
+    }
+
+    function updateDisplay() {
+      elapsedEl.textContent = formatTime(elapsedSeconds);
+      remainingEl.textContent = formatTime(
+        Math.max(totalSeconds - elapsedSeconds, 0)
+      );
+    }
+
+    document.getElementById("startBtn").onclick = () => {
+      if (timerId) return;
+
+      if (totalSeconds === 0) {
+        const input = document.getElementById("durationInput").value;
+        totalSeconds = parseDuration(input);
+        updateDisplay();
+      }
+
+      timerId = setInterval(() => {
+        elapsedSeconds++;
+        updateDisplay();
+
+        if (elapsedSeconds >= totalSeconds) {
+          clearInterval(timerId);
+          timerId = null;
+        }
+      }, 1000);
+    };
+
+    document.getElementById("pauseBtn").onclick = () => {
+      clearInterval(timerId);
+      timerId = null;
+    };
+
+    document.getElementById("resetBtn").onclick = () => {
+      clearInterval(timerId);
+      timerId = null;
+      elapsedSeconds = 0;
+      totalSeconds = 0;
+      updateDisplay();
+    };
+  </script>
+</body>
+</html>
