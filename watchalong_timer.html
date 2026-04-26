@@ -65,8 +65,8 @@
   <div class="app">
     <h1>🎬 同時視聴タイマー</h1>
 
-    <label>映画の長さ（分:秒）</label>
-    <input type="text" id="durationInput" placeholder="例：120:00">
+    <label>映画の長さ（分:秒 または 時:分:秒）</label>
+    <input type="text" id="durationInput" placeholder="例：2:22:03">
 
     <div class="time">
       <div>経過時間<br><strong id="elapsed">00:00:00</strong></div>
@@ -91,7 +91,12 @@
     function parseDuration(value) {
       const parts = value.split(":").map(Number);
       if (parts.length === 2) {
+        // mm:ss形式
         return parts[0] * 60 + parts[1];
+      }
+      else if (parts.length === 3) {
+        // hh:mm:ss形式
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
       }
       return 0;
     }
