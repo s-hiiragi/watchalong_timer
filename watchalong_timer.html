@@ -78,6 +78,18 @@
       <button class="pause" id="pauseBtn">一時停止</button>
       <button class="reset" id="resetBtn">リセット</button>
     </div>
+
+    <div class="controls">
+      <button id="plus1m">＋1分</button>
+      <button id="plus10s">＋10秒</button>
+      <button id="plus1s">＋1秒</button>
+    </div>
+
+    <div class="controls">
+      <button id="minus1m">−1分</button>
+      <button id="minus10s">−10秒</button>
+      <button id="minus1s">−1秒</button>
+    </div>
   </div>
 
   <script>
@@ -115,6 +127,15 @@
       );
     }
 
+    function jump(seconds) {
+      elapsedSeconds += seconds;
+
+      if (elapsedSeconds < 0) elapsedSeconds = 0;
+      if (elapsedSeconds > totalSeconds) elapsedSeconds = totalSeconds;
+
+      updateDisplay();
+    }
+
     document.getElementById("startBtn").onclick = () => {
       if (timerId) return;
 
@@ -147,6 +168,13 @@
       totalSeconds = 0;
       updateDisplay();
     };
+
+    document.getElementById("minus10s").onclick = () => jump(-10);
+    document.getElementById("plus10s").onclick  = () => jump(10);
+    document.getElementById("minus1s").onclick = () => jump(-1);
+    document.getElementById("plus1s").onclick  = () => jump(1);
+    document.getElementById("minus1m").onclick  = () => jump(-60);
+    document.getElementById("plus1m").onclick   = () => jump(60);
   </script>
 </body>
 </html>
