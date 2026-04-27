@@ -228,6 +228,14 @@
       }, 100);
     }
 
+    function resetAll() {
+      clearInterval(timerId);
+      timerId = null;
+      elapsedSeconds = 0;
+      totalSeconds = 0;
+      updateDisplay();
+    }
+
     document.getElementById("startBtn").onclick = (event) => {
       if (timerId) return;
 
@@ -257,11 +265,7 @@
     };
 
     document.getElementById("resetBtn").onclick = (event) => {
-      clearInterval(timerId);
-      timerId = null;
-      elapsedSeconds = 0;
-      totalSeconds = 0;
-      updateDisplay();
+      resetAll();
       pressButton(event.currentTarget.id);
     };
 
@@ -324,6 +328,13 @@
         case " ":
           e.preventDefault();
           togglePlayPause();
+          break;
+
+        case "r":
+        case "R":
+          e.preventDefault();
+          resetAll();
+          pressButton("resetBtn");
           break;
 
         case "?":
