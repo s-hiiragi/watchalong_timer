@@ -29,7 +29,7 @@
       display: block;
       margin-bottom: 4px;
     }
-    input {
+    input[type="text"] {
       width: 100%;
       padding: 8px;
       font-size: 16px;
@@ -115,6 +115,11 @@
     <label>映画の長さ（分:秒 または 時:分:秒）</label>
     <input type="text" id="durationInput" placeholder="例：2:22:03">
 
+    <label style="font-size:13px; margin-bottom:12px; display:block;">
+      <input type="checkbox" id="countdownToggle" checked>
+      −10秒から開始する
+    </label>
+
     <div class="time">
       <div>経過時間<br><strong id="elapsed">00:00:00</strong></div>
       <div>残り時間<br><strong id="remaining">00:00:00</strong></div>
@@ -159,13 +164,20 @@
   </div>
 
   <script>
+    const COUNTDOWN_SECONDS = 10;
+
     let totalSeconds = 0;
-    let elapsedSeconds = 0;
+    let elapsedSeconds = getInitialElapsed();
     let timerId = null;
 
     const elapsedEl = document.getElementById("elapsed");
     const remainingEl = document.getElementById("remaining");
     const helpOverlay = document.getElementById("helpOverlay");
+
+    function getInitialElapsed() {
+      const checked = document.getElementById("countdownToggle").checked;
+      return checked ? -COUNTDOWN_SECONDS : 0;
+    }
 
     function parseDuration(value) {
       const parts = value.split(":").map(Number);
@@ -181,10 +193,14 @@
     }
 
     function formatTime(sec) {
-      const h = String(Math.floor(sec / 3600)).padStart(2, "0");
-      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
-      const s = String(sec % 60).padStart(2, "0");
-      return `${h}:${m}:${s}`;
+      const sign = sec < 0 ? "-" : "";
+      const abs = Math.abs(sec);
+
+      const h = String(Math.floor(abs / 3600)).padStart(2, "0");
+      const m = String(Math.floor((abs % 3600) / 60)).padStart(2, "0");
+      const s = String(abs % 60).padStart(2, "0");
+
+      return `${sign}${h}:${m}:${s}`;
     }
 
     function updateDisplay() {
@@ -197,7 +213,6 @@
     function jump(seconds) {
       elapsedSeconds += seconds;
 
-      if (elapsedSeconds < 0) elapsedSeconds = 0;
       if (elapsedSeconds > totalSeconds) elapsedSeconds = totalSeconds;
 
       updateDisplay();
@@ -231,13 +246,18 @@
     function resetAll() {
       clearInterval(timerId);
       timerId = null;
-      elapsedSeconds = 0;
+      elapsedSeconds = getInitialElapsed();
       totalSeconds = 0;
       updateDisplay();
     }
 
     document.getElementById("startBtn").onclick = (event) => {
       if (timerId) return;
+
+      if (elapsedSeconds === 0 || elapsedSeconds === -COUNTDOWN_SECONDS) {
+        elapsedSeconds = getInitialElapsed();
+      }
+      console.log(elapsedSeconds);
 
       if (totalSeconds === 0) {
         const input = document.getElementById("durationInput").value;
